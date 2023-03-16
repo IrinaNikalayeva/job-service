@@ -4,15 +4,6 @@ import lombok.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Component;
 
 @Component
 @PropertySource("classpath:database.properties")
@@ -22,6 +13,7 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
+@Data
 public class DatabaseProperties {
 
     @Value("${POSTRGES_DRIVER_NAME}")

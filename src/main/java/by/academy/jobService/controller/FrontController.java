@@ -5,7 +5,7 @@ import by.academy.jobService.model.User;
 import by.academy.jobService.repository.UserRepositoryImpl;
 import by.academy.jobService.service.UserService;
 import by.academy.jobService.service.UserServiceImpl;
-
+import org.springframework.stereotype.Controller;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,7 +15,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Controller
 public class FrontController extends HttpServlet {
+
     private final UserService userService = new UserServiceImpl(new UserRepositoryImpl(new DatabaseProperties()));
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -27,7 +29,7 @@ public class FrontController extends HttpServlet {
         }
 
         private void doRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            RequestDispatcher dispatcher = req.getRequestDispatcher("/hello");
+            RequestDispatcher dispatcher = req.getRequestDispatcher("/users");
             if (dispatcher != null) {
                 System.out.println("Forward will be done!");
                 System.out.println("We are processing user request");

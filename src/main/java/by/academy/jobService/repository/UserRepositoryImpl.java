@@ -2,10 +2,12 @@ package by.academy.jobService.repository;
 
 import by.academy.jobService.configuration.DatabaseProperties;
 import by.academy.jobService.model.User;
+import by.academy.jobService.utils.DBConnection;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -17,10 +19,17 @@ import static by.academy.jobService.repository.columns.UserColumns.*;
 @Repository
 @RequiredArgsConstructor
 @Primary
-public class UserRepositoryImpl implements UserRepository{
-    private final DatabaseProperties properties;
+@Component
+public class UserRepositoryImpl implements UserRepository {
+    //private final DatabaseProperties properties;
 
     private final Logger logger = Logger.getLogger(UserRepositoryImpl.class);
+    DatabaseProperties properties;
+
+    @Autowired
+    public UserRepositoryImpl(DatabaseProperties properties) {
+        this.properties = properties;
+    }
 
     @Override
     public Object findOne(Object id) {
@@ -30,18 +39,16 @@ public class UserRepositoryImpl implements UserRepository{
     @Override
     public List<User> findAll() {
 
-        /*
-         * 1) Driver Manager - getting connection from DB
-         * */
-
         logger.info("Start of findAll method");
+
+        DBConnection dbConnection = new DBConnection(properties);
 
         final String findAllQuery = "select * from pg.\"pg.m_users\" order by id desc";
 
         List<User> result = new ArrayList<>();
 
-        registerDriver();
-        try (Connection connection = getConnection();
+        dbConnection.registerDriver();
+        try (Connection connection = dbConnection.getConnection();
              Statement statement = connection.createStatement();
              ResultSet rs = statement.executeQuery(findAllQuery)
         ) {
@@ -60,7 +67,7 @@ public class UserRepositoryImpl implements UserRepository{
     }
 
     @Override
-    public Object create(Object object) {
+    public User create(User object) {
         return null;
     }
 
@@ -75,7 +82,6 @@ public class UserRepositoryImpl implements UserRepository{
     }
 
     private User parseResultSet(ResultSet rs) {
-
         User user;
 
         try {
@@ -88,8 +94,7 @@ public class UserRepositoryImpl implements UserRepository{
             user.setUserRole(rs.getInt(USER_ROLE));
             user.setCreatedAt(rs.getTimestamp(CREATED_AT));
             user.setModifiedAt(rs.getTimestamp(MODIFIED_AT));
-            //user.setFullName(rs.getString(FULL_NAME));
-            //user.setWeight(rs.getDouble(WEIGHT));
+            logger.info("Parsing result. id : " + user.getId());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -97,23 +102,24 @@ public class UserRepositoryImpl implements UserRepository{
         return user;
     }
 
-    private void registerDriver() {
-        try {
-            Class.forName(properties.getDriverName());
-        } catch (ClassNotFoundException e) {
-            System.err.println("JDBC Driver Cannot be loaded!");
-            throw new RuntimeException("JDBC Driver Cannot be loaded!");
-        }
-    }
+//    private void registerDriver() {
+//        try {
+//            Class.forName(properties.getDriverName());
+//        } catch (ClassNotFoundException e) {
+//            System.err.println("JDBC Driver Cannot be loaded!");
+//            throw new RuntimeException("JDBC Driver Cannot be loaded!");
+//        }
+//    }
 
-    private Connection getConnection() {
-        String jdbcURL = StringUtils.join(properties.getUrl(), properties.getPort(), properties.getName());
-        try {
-            return DriverManager.getConnection(jdbcURL, properties.getLogin(), properties.getPassword());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    private Connection getConnection() {
+//        logger.info("Connecting to database");
+//        String jdbcURL = StringUtils.join(properties.getUrl(), properties.getPort(), properties.getName());
+//        try {
+//            return DriverManager.getConnection(jdbcURL, properties.getLogin(), properties.getPassword());
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     @Override
     public void searchUser() {

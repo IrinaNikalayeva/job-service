@@ -7,9 +7,11 @@ public interface CRUDRepository <K, T> {
 
     List<T> findAll();
 
-    T create(T object);
+    //K create(K object);
 
     T update(T object);
 
     void delete(K id);
+
+    //User create(User object);
 }
